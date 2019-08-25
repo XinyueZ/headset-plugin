@@ -12,26 +12,111 @@ android {
         minSdkVersion 14
         targetSdkVersion 29
         versionCode 1
-        versionName "1.0"
+        versionName "0.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary true
+    }
+    signingConfigs {
+        release {
+            keyAlias project.property("myKeyAlias")
+            keyPassword project.property("myKeyPassword")
+            storeFile file(project.property("myStoreFile"))
+            storePassword project.property("myStorePassword")
+        }
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+    }
+    testOptions {
+        animationsDisabled = true
+        unitTests {
+            all {
+                testLogging { exceptionFormat = "full" }
+            }
+            returnDefaultValues = true
+            includeAndroidResources = true
+        }
+    }
+    // work-runtime-ktx 2.1.0 and above now requires Java 8
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+    dataBinding {
+        enabled = true
     }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    /**
+     * Kotlin, coroutines
+     */
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+    /**
+     * General
+     */
     implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'androidx.core:core-ktx:1.0.2'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.0.0'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    implementation "androidx.fragment:fragment-ktx:1.2.0-alpha02"
+    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
+    implementation "androidx.navigation:navigation-fragment-ktx:$rootProject.navigationVersion"
+    implementation "androidx.navigation:navigation-ui-ktx:$rootProject.navigationVersion"
+    implementation "androidx.textclassifier:textclassifier:1.0.0-alpha02"
+    /**
+     * Firebase ML Kit
+     */
+    implementation 'com.google.firebase:firebase-ml-natural-language:21.0.0'
+    implementation 'com.google.firebase:firebase-ml-natural-language-language-id-model:20.0.3'
+    implementation 'com.google.firebase:firebase-ml-natural-language-translate-model:20.0.3'
+    /**
+     * Design
+     */
+    implementation "com.google.android.material:material:1.1.0-alpha09"
+    /**
+     * TESTs
+     */
+    testImplementation "junit:junit:4.12"
+    testImplementation "androidx.arch.core:core-testing:2.0.1"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion"
+    testImplementation("com.google.truth:truth:$truth") {
+        exclude group: 'com.google.guava', module: 'guava'
+    }
+    androidTestImplementation "androidx.arch.core:core-testing:2.0.1"
+    androidTestImplementation "androidx.test.espresso:espresso-contrib:$espressoVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
+    androidTestImplementation "androidx.test.ext:junit:1.1.1"
+    androidTestImplementation "androidx.test.uiautomator:uiautomator:2.2.0"
+    androidTestImplementation "androidx.work:work-testing:$workVersion"
+    androidTestImplementation("com.google.truth:truth:$truth") {
+        exclude group: 'com.google.guava', module: 'guava'
+    }
+    androidTestImplementation 'com.google.guava:guava:27.0.1-android'
+    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion"
+    /**
+     * MOCK
+     */
+    testImplementation ("org.mockito:mockito-core:$mockito") {
+        exclude group: 'net.bytebuddy'
+    }
+    testImplementation "org.mockito:mockito-inline:$mockito"
+    testImplementation "org.mockito:mockito-android:$mockito"
+    testImplementation "com.nhaarman:mockito-kotlin:$mockitoKotlin"
+    testImplementation "net.bytebuddy:byte-buddy:$byteBuddy"
+    androidTestImplementation ("org.mockito:mockito-core:$mockito"){
+        exclude group: 'net.bytebuddy'
+    }
+//    androidTestImplementation "org.mockito:mockito-inline:$mockito"
+    androidTestImplementation "org.mockito:mockito-android:$mockito"
+    androidTestImplementation "com.nhaarman:mockito-kotlin:$mockitoKotlin"
+    androidTestImplementation "net.bytebuddy:byte-buddy:$byteBuddy"
 }
