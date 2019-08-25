@@ -52,6 +52,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.google.gms:play-services-awareness:16.0.0'
+
     /**
      * Kotlin, coroutines
      */
