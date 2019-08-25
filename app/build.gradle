@@ -52,7 +52,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.google.gms:play-services-awareness:16.0.0'
+    implementation 'com.google.android.gms:play-services-awareness:17.1.0'
 
     /**
      * Kotlin, coroutines
@@ -122,5 +122,3 @@ dependencies {
     androidTestImplementation "com.nhaarman:mockito-kotlin:$mockitoKotlin"
     androidTestImplementation "net.bytebuddy:byte-buddy:$byteBuddy"
 }
-
-apply plugin: 'com.google.gms.google-services'
