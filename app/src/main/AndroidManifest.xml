@@ -17,13 +17,17 @@
             android:name="com.google.android.awareness.API_KEY"
             android:value="@string/awareness" />
 
-        <activity android:name=".MainActivity">
+        <receiver android:name=".BootUpReceiver" android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.DEFAULT" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.PACKAGE_INSTALL" />
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+
+                <data android:scheme="package" />
             </intent-filter>
-        </activity>
+        </receiver>
     </application>
 
 </manifest>

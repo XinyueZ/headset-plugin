@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">HPPi</string>
+    <string name="headphone_plug_in_message">Headset plugged in.</string>
+    <string name="headphone_plug_out_message">Headset plugged out.</string>
 </resources>

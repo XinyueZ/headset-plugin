@@ -1,6 +1,5 @@
 package io.hppi.repositories
 
-import android.app.Application
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -8,7 +7,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.text.TextUtils
 import android.util.Log
-import android.widget.Toast
 import com.google.android.gms.awareness.Awareness
 import com.google.android.gms.awareness.FenceClient
 import com.google.android.gms.awareness.SnapshotClient
@@ -18,6 +16,8 @@ import com.google.android.gms.awareness.fence.HeadphoneFence
 import com.google.android.gms.awareness.state.HeadphoneState
 import io.hppi.FENCE_HEADPHONE_ACTION
 import io.hppi.FENCE_KEY_HEADPHONE
+import io.hppi.extensions.clearNotifyHPPI
+import io.hppi.extensions.notifyHPPi
 
 interface IHeadphoneStateRepository {
     val fenceClient: FenceClient
@@ -50,7 +50,10 @@ class HeadphoneStateRepository(private val context: Context) : BroadcastReceiver
         snapshotClient.headphoneState.addOnSuccessListener { headphoneStateResponse ->
             val headphoneState = headphoneStateResponse.headphoneState
             val pluggedIn = headphoneState.state == HeadphoneState.PLUGGED_IN
-            Toast.makeText(context, "HPPi pluggedIn: $pluggedIn", Toast.LENGTH_SHORT).show()
+            when {
+                pluggedIn -> context.notifyHPPi()
+                else -> context.clearNotifyHPPI()
+            }
         }.addOnFailureListener { exp ->
             Log.e("HPPi", "Fence could not get snapshot: $exp");
         }
@@ -78,14 +81,13 @@ class HeadphoneStateRepository(private val context: Context) : BroadcastReceiver
                 FENCE_KEY_HEADPHONE
             )
         ) {
-            val fenceStateStr: String = when (fenceState.currentState) {
-                FenceState.TRUE -> "true"
-                FenceState.FALSE -> "false"
-                FenceState.UNKNOWN -> "unknown"
-                else -> "unknown value"
+            when {
+                fenceState.currentState == FenceState.TRUE -> context.notifyHPPi()
+                fenceState.currentState == FenceState.FALSE -> context.clearNotifyHPPI()
+                else -> {
+                    Log.e("HPPi", "Headphone fence state: unknown")
+                }
             }
-            Toast.makeText(context, "Headphone fence state: $fenceStateStr", Toast.LENGTH_SHORT)
-                .show()
         }
     }
 }
