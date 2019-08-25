@@ -2,29 +2,22 @@ package io.hppi.viewmodels
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.google.android.gms.common.api.GoogleApiClient
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import com.apple.eawt.Application.getApplication
-
-
+import com.google.android.gms.awareness.Awareness
+import com.google.android.gms.awareness.FenceClient
+import com.google.android.gms.awareness.SnapshotClient
 
 interface IHPPiViewModel {
-    val googleApiClient: GoogleApiClient
+    val fenceClient: FenceClient
+    val snapshotClient: SnapshotClient
 }
 
-abstract class HPPiViewModel(app: Application) : AndroidViewModel(app), IHPPiViewModel {
-    private lateinit var _googleApiClient: GoogleApiClient
+abstract class HPPiViewModel(app: Application) :
+    AndroidViewModel(app),
+    IHPPiViewModel {
 
-    override val googleApiClient: GoogleApiClient
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    override val fenceClient: FenceClient
+        get() = Awareness.getFenceClient(getApplication() as Application)
 
-    init {
-       _googleApiClient = GoogleApiClient.Builder(this)
-            .enableAutoManage(
-                this /* FragmentActivity */,
-                this /* OnConnectionFailedListener */
-            )
-            .addApi(Awareness.API)
-            .build()
-    }
+    override val snapshotClient: SnapshotClient
+        get() = Awareness.getSnapshotClient(getApplication() as Application)
 }
