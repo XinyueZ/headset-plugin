@@ -1,20 +1,164 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.main.MainFragment">
+    tools:context=".ui.MainActivity">
 
-    <TextView
-        android:id="@+id/message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="MainFragment"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <data>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <import type="android.view.View" />
+
+        <variable
+            name="viewModel"
+            type="io.hppi.viewmodels.MainViewModel" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="@dimen/general_padding_margin">
+
+
+            <TextView
+                android:id="@+id/setup_caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/general_padding_margin"
+                android:text="@string/app_name"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large.Inverse"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:layout_width="@android:dimen/thumbnail_width"
+                android:layout_height="@android:dimen/thumbnail_height"
+                android:paddingTop="@dimen/general_padding_margin_larger"
+                android:paddingLeft="@dimen/general_padding_margin_larger"
+                android:paddingRight="@dimen/general_padding_margin_larger"
+                android:layout_margin="@dimen/general_padding_margin_larger"
+                app:layout_constraintBottom_toTopOf="@id/setup_description"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:srcCompat="@drawable/ic_headphone"
+                tools:ignore="ContentDescription" />
+
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/h_center_guide"
+                android:layout_width="wrap_content"
+                android:layout_height="1dp"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintGuide_percent="0.5555"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/v_center_guide"
+                android:layout_width="wrap_content"
+                android:layout_height="1dp"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintGuide_percent="0.5"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/setup_description_container"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:paddingLeft="@dimen/general_padding_margin_larger"
+                android:paddingRight="@dimen/general_padding_margin_larger"
+                android:visibility="@{viewModel.descriptionProcessed ? View.INVISIBLE : View.VISIBLE}"
+                app:layout_constraintTop_toTopOf="@id/setup_description"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:startAnim="@{!viewModel.descriptionProcessed}">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start|left"
+                    android:orientation="vertical">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="10dp"
+                        android:layout_marginBottom="@dimen/general_padding_margin"
+                        android:background="@android:color/darker_gray" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="10dp"
+                        android:layout_marginEnd="@dimen/general_padding_margin"
+                        android:layout_marginBottom="@dimen/general_padding_margin"
+                        android:background="@android:color/darker_gray" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="10dp"
+                        android:layout_marginEnd="@dimen/general_padding_margin_larger"
+                        android:background="@android:color/darker_gray" />
+                </LinearLayout>
+
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
+
+            <TextView
+                android:id="@+id/setup_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/general_padding_margin"
+                android:layout_marginEnd="@dimen/general_padding_margin"
+                android:layout_marginBottom="@dimen/general_padding_margin"
+                android:gravity="center"
+                android:lineSpacingExtra="10.5dp"
+                android:text="@{viewModel.appDescription}"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium.Inverse"
+                android:visibility="@{viewModel.descriptionProcessed ? View.VISIBLE  : View.INVISIBLE}"
+                app:layout_constraintBottom_toTopOf="@id/h_center_guide"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:text="@string/headphone_plug_in_description" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/setup_abort"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="@{viewModel.isActivate}"
+                android:layout_marginTop="@dimen/general_padding_margin"
+                android:onCheckedChanged="@{(_, checked)-> viewModel.setup(checked)}"
+                android:visibility="@{viewModel.descriptionProcessed ? View.VISIBLE  : View.INVISIBLE}"
+                app:backgroundTint="@color/colorAccent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/h_center_guide" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="@{(_) -> viewModel.shareApp(@string/share_app)}"
+                app:backgroundTint="?android:textColorSecondary"
+                app:elevation="0dp"
+                app:fabSize="mini"
+                app:layout_constraintBottom_toBottomOf="@id/setup_caption"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/setup_caption"
+                app:srcCompat="@drawable/ic_share"
+                app:tint="@android:color/white" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            style="@style/TextAppearance.MaterialComponents.Overline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:layout_marginEnd="5dp"
+            android:text="@{viewModel.appVersion}"
+            tools:text="v0.0.x+y" />
+    </FrameLayout>
+</layout>
