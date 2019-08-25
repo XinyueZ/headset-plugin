@@ -1,18 +1,26 @@
-package io.hppi
+package io.hppi.ui
 
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import io.hppi.R
+import io.hppi.databinding.MainActivityBinding
 import io.hppi.viewmodels.MainViewModel
 import io.hppi.viewmodels.MainViewModelFactory
 
 class MainActivity : AppCompatActivity() {
-    private val viewModel: MainViewModel by viewModels {
+    private val vm: MainViewModel by viewModels {
         MainViewModelFactory(application)
     }
 
+    override fun onBackPressed() = Unit
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.main_activity)
+        DataBindingUtil.setContentView<MainActivityBinding>(this, R.layout.main_activity)
+            .apply {
+                viewModel = vm
+            }
     }
 }

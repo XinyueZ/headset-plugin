@@ -14,10 +14,13 @@ import com.google.android.gms.awareness.fence.FenceState
 import com.google.android.gms.awareness.fence.FenceUpdateRequest
 import com.google.android.gms.awareness.fence.HeadphoneFence
 import com.google.android.gms.awareness.state.HeadphoneState
-import io.hppi.FENCE_HEADPHONE_ACTION
-import io.hppi.FENCE_KEY_HEADPHONE
+import io.hppi.BuildConfig
+import io.hppi.R
 import io.hppi.extensions.clearNotifyHPPI
 import io.hppi.extensions.notifyHPPi
+
+const val FENCE_KEY_HEADPHONE = "fence_key_headphone"
+const val FENCE_HEADPHONE_ACTION = BuildConfig.APPLICATION_ID + "FENCE_HEADPHONE_ACTION"
 
 interface IHeadphoneStateRepository {
     val fenceClient: FenceClient
@@ -26,6 +29,9 @@ interface IHeadphoneStateRepository {
 
 class HeadphoneStateRepository(private val context: Context) : BroadcastReceiver(),
     IHeadphoneStateRepository {
+
+    private var notifyMsg = context.getString(R.string.headphone_plug_in_message)
+
     private val headphoneFence = HeadphoneFence.during(HeadphoneState.PLUGGED_IN)
 
     private val intent = Intent(FENCE_HEADPHONE_ACTION);
@@ -51,7 +57,7 @@ class HeadphoneStateRepository(private val context: Context) : BroadcastReceiver
             val headphoneState = headphoneStateResponse.headphoneState
             val pluggedIn = headphoneState.state == HeadphoneState.PLUGGED_IN
             when {
-                pluggedIn -> context.notifyHPPi()
+                pluggedIn -> context.notifyHPPi(notifyMsg)
                 else -> context.clearNotifyHPPI()
             }
         }.addOnFailureListener { exp ->
@@ -82,7 +88,7 @@ class HeadphoneStateRepository(private val context: Context) : BroadcastReceiver
             )
         ) {
             when {
-                fenceState.currentState == FenceState.TRUE -> context.notifyHPPi()
+                fenceState.currentState == FenceState.TRUE -> context.notifyHPPi(notifyMsg)
                 fenceState.currentState == FenceState.FALSE -> context.clearNotifyHPPI()
                 else -> {
                     Log.e("HPPi", "Headphone fence state: unknown")

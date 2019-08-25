@@ -20,6 +20,6 @@
 
     <fragment
         android:id="@+id/main_fragment"
-        android:name="io.hppi.MainFragment" />
+        android:name="io.hppi.ui.MainFragment" />
 
 </navigation>

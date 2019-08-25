@@ -10,24 +10,24 @@ import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES.O
 import androidx.core.app.NotificationCompat
 import androidx.core.content.getSystemService
-import io.hppi.MainActivity
 import io.hppi.R
-import kotlinx.android.synthetic.main.main_fragment.view.*
+import io.hppi.services.HPPiService
+import io.hppi.ui.MainActivity
 
 const val NOTIFY_ID: Int = 0x12
 const val NOTIFY_CHANNEL_ID: String = "hppi channel"
 const val NOTIFY_CHANNEL_NAME: String = NOTIFY_CHANNEL_ID
 
-fun Context.notifyHPPi() {
+fun Context.notifyHPPi(message: String) {
     val largeNotificationImage =
-        BitmapFactory.decodeResource(resources, io.hppi.R.drawable.ic_headphone_state);
+        BitmapFactory.decodeResource(resources, R.drawable.ic_headphone_state)
 
     val ii = Intent(this, MainActivity::class.java)
     val pendingIntent = PendingIntent.getActivity(this, 0, ii, 0)
 
     val builder = NotificationCompat.Builder(this, NOTIFY_CHANNEL_ID)
     builder.setOngoing(true)
-        .setContentText(getString(R.string.headphone_plug_in_message))
+        .setContentText(message)
         .setContentIntent(pendingIntent)
         .setWhen(System.currentTimeMillis())
         .setLargeIcon(largeNotificationImage)
@@ -50,4 +50,8 @@ fun Context.notifyHPPi() {
 
 fun Context.clearNotifyHPPI() {
     getSystemService<NotificationManager>()?.cancel(NOTIFY_ID)
+}
+
+fun Context.startHPPiService() {
+    startService(Intent(this, HPPiService::class.java))
 }

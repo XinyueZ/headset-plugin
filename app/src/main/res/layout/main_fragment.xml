@@ -1,27 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.MainActivity">
 
     <data>
 
+        <import type="android.view.View" />
+
+        <variable
+            name="viewModel"
+            type="io.hppi.viewmodels.MainViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/main"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".MainActivity">
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="@dimen/general_padding_margin">
+
+
+            <TextView
+                android:id="@+id/setup_caption"
+                style="@style/TextAppearance.MaterialComponents.Headline2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/general_padding_margin"
+                android:text="@string/app_name"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <VideoView
+                android:id="@+id/setup_video"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginTop="@dimen/general_padding_margin"
+                app:layout_constraintBottom_toTopOf="@id/setup_done"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/setup_caption"
+                tools:ignore="ContentDescription" />
+            <!--            app:src="@{@string/setup_guide_file}"-->
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/setup_done"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/general_padding_margin"
+                android:onClick="@{(_) -> viewModel.setup()}"
+                android:text="@android:string/ok"
+                app:elevation="@dimen/fab_elevation"
+                app:fabSize="normal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:srcCompat="@drawable/ic_done" />
+
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="@{(_) -> viewModel.shareApp(@string/share_app)}"
+                app:backgroundTint="?android:textColorSecondary"
+                app:elevation="0dp"
+                app:fabSize="mini"
+                app:layout_constraintBottom_toBottomOf="@id/setup_caption"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/setup_caption"
+                app:srcCompat="@drawable/ic_share"
+                app:tint="@android:color/white" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
-            android:id="@+id/message"
+            style="@style/TextAppearance.MaterialComponents.Overline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="MainFragment"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_gravity="top|end"
+            android:layout_marginEnd="5dp"
+            android:text="@{viewModel.appVersion}"
+            tools:text="v0.0.x+y" />
+    </FrameLayout>
 </layout>
