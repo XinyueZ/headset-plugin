@@ -2,7 +2,6 @@ package io.hppi
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import io.hppi.ui.main.MainFragment
 
 class MainActivity : AppCompatActivity() {
 
