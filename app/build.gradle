@@ -9,7 +9,7 @@ android {
     buildToolsVersion "29.0.1"
     defaultConfig {
         applicationId "io.hppi"
-        minSdkVersion 14
+        minSdkVersion 18
         targetSdkVersion 29
         versionCode 1
         versionName "0.0.1"
@@ -122,3 +122,5 @@ dependencies {
     androidTestImplementation "com.nhaarman:mockito-kotlin:$mockitoKotlin"
     androidTestImplementation "net.bytebuddy:byte-buddy:$byteBuddy"
 }
+
+apply plugin: 'com.google.gms.google-services'
