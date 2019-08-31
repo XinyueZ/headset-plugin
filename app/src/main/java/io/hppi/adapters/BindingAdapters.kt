@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.MediaController
 import android.widget.VideoView
 import androidx.databinding.BindingAdapter
+import com.facebook.shimmer.ShimmerFrameLayout
 
 @BindingAdapter("src")
 fun VideoView.setSource(filename: String) {
@@ -18,5 +19,13 @@ fun VideoView.setSource(filename: String) {
         it.setVolume(0f, 0f)
         it.isLooping = true
         start()
+    }
+}
+
+@BindingAdapter("startAnim")
+fun ShimmerFrameLayout.startAnim(start: Boolean) {
+    when (start) {
+        true -> startShimmer()
+        else -> stopShimmer()
     }
 }

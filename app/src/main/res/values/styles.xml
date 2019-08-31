@@ -15,4 +15,13 @@
     </style>
 
     <style name="MainActivityTheme" parent="MainActivityThemeBase" />
+
+    <style name="SetUpFab">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">@dimen/general_padding_margin</item>
+        <item name="useCompatPadding">@dimen/general_padding_margin</item>
+        <item name="fabSize">normal</item>
+        <item name="elevation">@dimen/fab_elevation</item>
+    </style>
 </resources>

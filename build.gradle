@@ -11,7 +11,7 @@ buildscript {
         mockitoKotlin = "1.6.0"
         navigationVersion = '2.2.0-alpha01'
         truth = "0.42"
-        workVersion = '2.1.0'
+        workVersion = '2.2.0'
     }
 
     repositories {

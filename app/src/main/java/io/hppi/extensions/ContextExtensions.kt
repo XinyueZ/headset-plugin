@@ -1,5 +1,6 @@
 package io.hppi.extensions
 
+import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -7,11 +8,12 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
 import android.os.Build.VERSION_CODES.O
 import androidx.core.app.NotificationCompat
+import androidx.core.app.ShareCompat
 import androidx.core.content.getSystemService
 import io.hppi.R
-import io.hppi.services.HPPiService
 import io.hppi.ui.MainActivity
 
 const val NOTIFY_ID: Int = 0x12
@@ -52,6 +54,19 @@ fun Context.clearNotifyHPPI() {
     getSystemService<NotificationManager>()?.cancel(NOTIFY_ID)
 }
 
-fun Context.startHPPiService() {
-    startService(Intent(this, HPPiService::class.java))
+fun Context.shareCompat(shareText: String) {
+    val shareIntent = ShareCompat.IntentBuilder.from(this as Activity)
+        .setText(shareText)
+        .setType("text/plain")
+        .createChooserIntent()
+        .apply {
+            if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
+                // If we're on Lollipop, we can open the intent as a document
+                addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+            } else {
+                // Else, we will use the old CLEAR_WHEN_TASK_RESET flag
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
+            }
+        }
+    startActivity(shareIntent)
 }

@@ -6,6 +6,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import io.hppi.R
 import io.hppi.databinding.MainActivityBinding
+import io.hppi.events.EventObserver
+import io.hppi.extensions.shareCompat
+import io.hppi.services.enqueueHPPiWorker
 import io.hppi.viewmodels.MainViewModel
 import io.hppi.viewmodels.MainViewModelFactory
 
@@ -20,6 +23,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         DataBindingUtil.setContentView<MainActivityBinding>(this, R.layout.main_activity)
             .apply {
+                lifecycleOwner = this@MainActivity
                 viewModel = vm
             }
     }

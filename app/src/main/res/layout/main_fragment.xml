@@ -34,31 +34,103 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <VideoView
-                android:id="@+id/setup_video"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_marginTop="@dimen/general_padding_margin"
-                app:layout_constraintBottom_toTopOf="@id/setup_done"
+            <ImageView
+                android:layout_width="@android:dimen/notification_large_icon_width"
+                android:layout_height="@android:dimen/notification_large_icon_height"
+                android:layout_margin="@dimen/general_padding_margin"
+                app:layout_constraintBottom_toTopOf="@id/setup_description"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/setup_caption"
+                app:srcCompat="@drawable/ic_headset_guide"
                 tools:ignore="ContentDescription" />
-            <!--            app:src="@{@string/setup_guide_file}"-->
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/setup_done"
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/h_center_guide"
+                android:layout_width="wrap_content"
+                android:layout_height="1dp"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintGuide_percent="0.55"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/v_center_guide"
+                android:layout_width="wrap_content"
+                android:layout_height="1dp"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintGuide_percent="0.5"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/setup_description_container"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:paddingLeft="@dimen/general_padding_margin_larger"
+                android:paddingTop="@dimen/general_padding_margin"
+                android:paddingRight="@dimen/general_padding_margin_larger"
+                android:visibility="@{viewModel.descriptionProcessed ? View.INVISIBLE : View.VISIBLE}"
+                app:layout_constraintBottom_toTopOf="@id/h_center_guide"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:startAnim="@{!viewModel.descriptionProcessed}">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="10dp"
+                        android:layout_marginBottom="@dimen/general_padding_margin"
+                        android:background="@android:color/darker_gray" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="10dp"
+                        android:layout_marginStart="@dimen/general_padding_margin"
+                        android:layout_marginEnd="@dimen/general_padding_margin"
+                        android:layout_marginBottom="@dimen/general_padding_margin"
+                        android:background="@android:color/darker_gray" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="10dp"
+                        android:layout_marginStart="@dimen/general_padding_margin_larger"
+                        android:layout_marginEnd="@dimen/general_padding_margin_larger"
+                        android:background="@android:color/darker_gray" />
+                </LinearLayout>
+
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
+
+            <TextView
+                android:id="@+id/setup_description"
+                style="@style/TextAppearance.MaterialComponents.Headline5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/general_padding_margin"
-                android:onClick="@{(_) -> viewModel.setup()}"
-                android:text="@android:string/ok"
-                app:elevation="@dimen/fab_elevation"
-                app:fabSize="normal"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:gravity="center"
+                android:text="@{viewModel.appDescription}"
+                android:visibility="@{viewModel.descriptionProcessed ? View.VISIBLE  : View.INVISIBLE}"
+                app:layout_constraintBottom_toTopOf="@id/h_center_guide"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:srcCompat="@drawable/ic_done" />
+                app:layout_constraintStart_toStartOf="parent"
+                tools:text="@string/headphone_plug_in_description" />
 
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/setup_abort"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onCheckedChanged="@{(_, checked)-> viewModel.setup(checked)}"
+                android:visibility="@{viewModel.descriptionProcessed ? View.VISIBLE  : View.INVISIBLE}"
+                app:backgroundTint="@color/colorAccent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/h_center_guide" />
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:layout_width="wrap_content"
@@ -72,7 +144,6 @@
                 app:layout_constraintTop_toTopOf="@id/setup_caption"
                 app:srcCompat="@drawable/ic_share"
                 app:tint="@android:color/white" />
-
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

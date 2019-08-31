@@ -27,27 +27,31 @@ interface IHeadphoneStateRepository {
     val snapshotClient: SnapshotClient
 }
 
-class HeadphoneStateRepository(private val context: Context) : BroadcastReceiver(),
+class HeadphoneStateRepository(context: Context) : BroadcastReceiver(),
     IHeadphoneStateRepository {
 
     private var notifyMsg = context.getString(R.string.headphone_plug_in_message)
 
     private val headphoneFence = HeadphoneFence.during(HeadphoneState.PLUGGED_IN)
 
-    private val intent = Intent(FENCE_HEADPHONE_ACTION);
-    private val pendingIntent: PendingIntent
-        get() =
-            PendingIntent.getBroadcast(context, 0, intent, 0);
+    private val intent = Intent(FENCE_HEADPHONE_ACTION)
+    private val pendingIntent: PendingIntent by lazy {
+        PendingIntent.getBroadcast(
+            context,
+            0,
+            intent,
+            0
+        )
+    }
 
     private val fenceHeadphoneActionFilter = IntentFilter(FENCE_HEADPHONE_ACTION)
 
-    override val fenceClient: FenceClient
-        get() = Awareness.getFenceClient(context)
+    override val fenceClient: FenceClient by lazy { Awareness.getFenceClient(context) }
 
-    override val snapshotClient: SnapshotClient
-        get() = Awareness.getSnapshotClient(context)
+    override val snapshotClient: SnapshotClient by lazy { Awareness.getSnapshotClient(context) }
 
-    fun setup() {
+    fun setup(context: Context) {
+        Log.i("HPPi", "setup()")
         context.registerReceiver(
             this,
             fenceHeadphoneActionFilter
@@ -61,7 +65,7 @@ class HeadphoneStateRepository(private val context: Context) : BroadcastReceiver
                 else -> context.clearNotifyHPPI()
             }
         }.addOnFailureListener { exp ->
-            Log.e("HPPi", "Fence could not get snapshot: $exp");
+            Log.e("HPPi", "Fence could not get snapshot: $exp")
         }
 
         fenceClient.updateFences(
@@ -69,9 +73,11 @@ class HeadphoneStateRepository(private val context: Context) : BroadcastReceiver
                 .addFence(FENCE_KEY_HEADPHONE, headphoneFence, pendingIntent)
                 .build()
         ).addOnFailureListener { exp ->
-            Log.e("HPPi", "Fence could not be registered: $exp");
+            Log.e("HPPi", "Fence could not be registered: $exp")
         }
     }
+
+    fun tearDown(context: Context) = context.unregisterReceiver(this)
 
     override fun onReceive(context: Context, intent: Intent) {
         if (!TextUtils.equals(
@@ -80,6 +86,7 @@ class HeadphoneStateRepository(private val context: Context) : BroadcastReceiver
             )
         ) return
 
+        Log.i("HPPi", "receive()")
         val fenceState: FenceState = FenceState.extract(intent)
 
         if (TextUtils.equals(
@@ -93,6 +100,18 @@ class HeadphoneStateRepository(private val context: Context) : BroadcastReceiver
                 else -> {
                     Log.e("HPPi", "Headphone fence state: unknown")
                 }
+            }
+        }
+    }
+
+    companion object {
+
+        @Volatile
+        private var instance: HeadphoneStateRepository? = null
+
+        fun getInstance(context: Context): HeadphoneStateRepository {
+            return instance ?: synchronized(this) {
+                instance ?: HeadphoneStateRepository(context).also { instance = it }
             }
         }
     }
