@@ -16,8 +16,8 @@ import com.google.android.gms.awareness.fence.HeadphoneFence
 import com.google.android.gms.awareness.state.HeadphoneState
 import io.hppi.BuildConfig
 import io.hppi.R
-import io.hppi.extensions.clearNotifyHPPI
-import io.hppi.extensions.notifyHPPi
+import io.hppi.extensions.clearNotification
+import io.hppi.extensions.showNotification
 
 const val FENCE_KEY_HEADPHONE = "fence_key_headphone"
 const val FENCE_HEADPHONE_ACTION = BuildConfig.APPLICATION_ID + "FENCE_HEADPHONE_ACTION"
@@ -27,10 +27,16 @@ interface IHeadphoneStateRepository {
     val snapshotClient: SnapshotClient
 }
 
-class HeadphoneStateRepository(context: Context) : BroadcastReceiver(),
-    IHeadphoneStateRepository {
+interface HeadphoneStateListener {
+    fun onPlugIn()
+    fun onPlugOut()
+}
 
-    private var notifyMsg = context.getString(R.string.headphone_plug_in_message)
+class HeadphoneStateRepository private constructor(context: Context) : BroadcastReceiver(),
+    IHeadphoneStateRepository {
+    var headphoneStateListener: HeadphoneStateListener? = null
+
+    private var plugInMsg = context.getString(R.string.headphone_plug_in_message)
 
     private val headphoneFence = HeadphoneFence.during(HeadphoneState.PLUGGED_IN)
 
@@ -61,8 +67,8 @@ class HeadphoneStateRepository(context: Context) : BroadcastReceiver(),
             val headphoneState = headphoneStateResponse.headphoneState
             val pluggedIn = headphoneState.state == HeadphoneState.PLUGGED_IN
             when {
-                pluggedIn -> context.notifyHPPi(notifyMsg)
-                else -> context.clearNotifyHPPI()
+                pluggedIn -> context.showNotification(plugInMsg)
+                else -> context.clearNotification()
             }
         }.addOnFailureListener { exp ->
             Log.e("HPPi", "Fence could not get snapshot: $exp")
@@ -95,8 +101,14 @@ class HeadphoneStateRepository(context: Context) : BroadcastReceiver(),
             )
         ) {
             when {
-                fenceState.currentState == FenceState.TRUE -> context.notifyHPPi(notifyMsg)
-                fenceState.currentState == FenceState.FALSE -> context.clearNotifyHPPI()
+                fenceState.currentState == FenceState.TRUE -> {
+                    context.showNotification(plugInMsg)
+                    headphoneStateListener?.onPlugIn()
+                }
+                fenceState.currentState == FenceState.FALSE -> {
+                    context.clearNotification()
+                    headphoneStateListener?.onPlugOut()
+                }
                 else -> {
                     Log.e("HPPi", "Headphone fence state: unknown")
                 }

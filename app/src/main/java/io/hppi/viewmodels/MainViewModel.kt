@@ -16,12 +16,13 @@ import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslatorOption
 import io.hppi.BuildConfig
 import io.hppi.R
 import io.hppi.events.Event
+import io.hppi.repositories.HeadphoneStateListener
 import java.util.Locale
 
 const val UND = -1
 const val IS_ACTIVATE_USAGE = "io.hppi.activate.usage"
 
-class MainViewModel(app: Application) : AndroidViewModel(app) {
+class MainViewModel(app: Application) : AndroidViewModel(app), HeadphoneStateListener {
     val appVersion = "v${BuildConfig.VERSION_NAME}+${BuildConfig.VERSION_CODE}"
     val appDescription =
         ObservableField<String>(getApplication<Application>().getString(R.string.headphone_plug_in_description))
@@ -34,7 +35,9 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val _onShareApp = MutableLiveData<Event<String>>()
     val onShareApp: LiveData<Event<String>> = _onShareApp
     private val _onTest = MutableLiveData<Event<String>>()
-    val onText: LiveData<Event<String>> = _onTest
+    val onTest: LiveData<Event<String>> = _onTest
+    private val _onTestFinished = MutableLiveData<Event<String>>()
+    val onTestFinished: LiveData<Event<String>> = _onTestFinished
 
     private var sourceLanguageId: Int = UND
 
@@ -68,8 +71,8 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     fun processDescription() {
         descriptionProcessed.set(false)
-        translateText(getApplication<Application>().getString(R.string.headphone_plug_in_description)) { translatedDescription ->
-            appDescription.set(translatedDescription)
+        translateText(getApplication<Application>().getString(R.string.headphone_plug_in_description)) { translatedText ->
+            appDescription.set(translatedText)
             descriptionProcessed.set(true)
         }
     }
@@ -84,13 +87,24 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     private fun done() {
         isActivate = true
         _onDone.value = Event(Unit)
-        _onTest.value =
-            Event(getApplication<Application>().getString(R.string.headphone_plug_in_test))
+        translateText(getApplication<Application>().getString(R.string.headphone_plug_in_test)) { translatedText ->
+            _onTest.value = Event(translatedText)
+        }
     }
 
     private fun abort() {
         isActivate = false
         _onAbort.value = Event(Unit)
+    }
+
+    override fun onPlugIn() {
+        translateText(getApplication<Application>().getString(R.string.headphone_test_finished)) { translatedText ->
+            _onTestFinished.value = Event(translatedText)
+        }
+    }
+
+    override fun onPlugOut() {
+        //TODO
     }
 
     fun shareApp(shareText: String) {

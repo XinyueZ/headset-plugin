@@ -28,23 +28,29 @@ class MainFragment : Fragment() {
         return MainFragmentBinding.inflate(inflater).apply {
             lifecycleOwner = viewLifecycleOwner
             viewModel = vm
-            subscribeUi()
-        }.root
-    }
 
-    private fun MainFragmentBinding.subscribeUi() {
-        viewModel.processDescription()
-        viewModel.onAbort.observe(viewLifecycleOwner, EventObserver {
-            requireActivity().finish()
-        })
-        viewModel.onDone.observe(requireActivity(), EventObserver {
-            requireActivity().enqueueHPPiWorker()
-        })
-        viewModel.onText.observe(requireActivity(), EventObserver { testNotifyMsg ->
-            Snackbar.make(root, testNotifyMsg, Snackbar.LENGTH_INDEFINITE).show()
-        })
-        viewModel.onShareApp.observe(requireActivity(), EventObserver { shareText ->
-            requireActivity().shareCompat(shareText)
-        })
+            vm.processDescription()
+            vm.onAbort.observe(viewLifecycleOwner, EventObserver {
+                requireActivity().finish()
+            })
+            vm.onDone.observe(requireActivity(), EventObserver {
+                requireActivity().enqueueHPPiWorker().apply {
+                    this.headphoneStateListener = vm
+                }
+            })
+            vm.onTest.observe(requireActivity(), EventObserver { testNotifyMsg ->
+                Snackbar.make(root, testNotifyMsg, Snackbar.LENGTH_INDEFINITE).show()
+            })
+            vm.onTestFinished.observe(requireActivity(), EventObserver { testFinishedNotifyMsg ->
+                Snackbar.make(root, testFinishedNotifyMsg, Snackbar.LENGTH_INDEFINITE).setAction(
+                    android.R.string.ok
+                ) {
+                    requireActivity().finish()
+                }.show()
+            })
+            vm.onShareApp.observe(requireActivity(), EventObserver { shareText ->
+                requireActivity().shareCompat(shareText)
+            })
+        }.root
     }
 }

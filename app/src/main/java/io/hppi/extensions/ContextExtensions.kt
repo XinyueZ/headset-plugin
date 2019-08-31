@@ -20,7 +20,7 @@ const val NOTIFY_ID: Int = 0x12
 const val NOTIFY_CHANNEL_ID: String = "hppi channel"
 const val NOTIFY_CHANNEL_NAME: String = NOTIFY_CHANNEL_ID
 
-fun Context.notifyHPPi(message: String) {
+fun Context.showNotification(message: String, isOngoing: Boolean = true) {
     val largeNotificationImage =
         BitmapFactory.decodeResource(resources, R.drawable.ic_headphone_state)
 
@@ -28,7 +28,7 @@ fun Context.notifyHPPi(message: String) {
     val pendingIntent = PendingIntent.getActivity(this, 0, ii, 0)
 
     val builder = NotificationCompat.Builder(this, NOTIFY_CHANNEL_ID)
-    builder.setOngoing(true)
+    builder
         .setContentText(message)
         .setContentIntent(pendingIntent)
         .setWhen(System.currentTimeMillis())
@@ -37,6 +37,8 @@ fun Context.notifyHPPi(message: String) {
         .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setSmallIcon(R.drawable.ic_headphone_state)
         .setContentTitle(getString(R.string.app_name))
+
+    if (isOngoing) builder.setOngoing(isOngoing) else builder.setOngoing(false)
 
     if (VERSION.SDK_INT >= O) {
         val channel = NotificationChannel(
@@ -50,7 +52,7 @@ fun Context.notifyHPPi(message: String) {
     getSystemService<NotificationManager>()?.notify(NOTIFY_ID, builder.build())
 }
 
-fun Context.clearNotifyHPPI() {
+fun Context.clearNotification() {
     getSystemService<NotificationManager>()?.cancel(NOTIFY_ID)
 }
 

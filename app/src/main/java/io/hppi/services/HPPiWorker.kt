@@ -14,12 +14,13 @@ class HPPiWorker(
 ) : Worker(context, workerParams) {
 
     override fun doWork(): Result {
-        HeadphoneStateRepository(applicationContext).setup(applicationContext)
+        HeadphoneStateRepository.getInstance(applicationContext).setup(applicationContext)
         return Result.success()
     }
 }
 
-fun Context.enqueueHPPiWorker() {
+fun Context.enqueueHPPiWorker(): HeadphoneStateRepository {
     val request: WorkRequest = OneTimeWorkRequest.Builder(HPPiWorker::class.java).build()
     WorkManager.getInstance(applicationContext).enqueue(request)
+    return HeadphoneStateRepository.getInstance(applicationContext)
 }
