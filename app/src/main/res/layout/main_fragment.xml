@@ -115,6 +115,7 @@
                 android:layout_marginEnd="@dimen/general_padding_margin"
                 android:layout_marginBottom="@dimen/general_padding_margin"
                 android:gravity="center"
+                android:lineSpacingExtra="10.5dp"
                 android:text="@{viewModel.appDescription}"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium.Inverse"
                 android:visibility="@{viewModel.descriptionProcessed ? View.VISIBLE  : View.INVISIBLE}"
