@@ -72,8 +72,12 @@ class HeadphoneStateRepository private constructor(context: Context) :
                     translateText(plugInMsg) {
                         context.showNotification(it, R.drawable.ic_headphone_notification)
                     }
+                    headphoneStateListener?.onPlugIn()
                 }
-                else -> context.clearNotification()
+                else -> {
+                    context.clearNotification()
+                    headphoneStateListener?.onPlugOut()
+                }
             }
         }.addOnFailureListener { exp ->
             Log.e("HPPi", "Fence could not get snapshot: $exp")
