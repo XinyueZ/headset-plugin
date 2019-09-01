@@ -16,6 +16,8 @@ import com.google.android.gms.awareness.fence.HeadphoneFence
 import com.google.android.gms.awareness.state.HeadphoneState
 import io.hppi.BuildConfig
 import io.hppi.R
+import io.hppi.domains.AppWordingTranslator
+import io.hppi.domains.IWordingTranslator
 import io.hppi.extensions.clearNotification
 import io.hppi.extensions.showNotification
 
@@ -32,8 +34,13 @@ interface HeadphoneStateListener {
     fun onPlugOut()
 }
 
-class HeadphoneStateRepository private constructor(context: Context) : BroadcastReceiver(),
-    IHeadphoneStateRepository {
+class HeadphoneStateRepository private constructor(
+    context: Context,
+    wordingTranslator: IWordingTranslator = AppWordingTranslator
+) : BroadcastReceiver(),
+    IHeadphoneStateRepository,
+    IWordingTranslator by wordingTranslator {
+
     var headphoneStateListener: HeadphoneStateListener? = null
 
     private var plugInMsg = context.getString(R.string.headphone_plug_in_message)
@@ -67,7 +74,11 @@ class HeadphoneStateRepository private constructor(context: Context) : Broadcast
             val headphoneState = headphoneStateResponse.headphoneState
             val pluggedIn = headphoneState.state == HeadphoneState.PLUGGED_IN
             when {
-                pluggedIn -> context.showNotification(plugInMsg)
+                pluggedIn -> {
+                    translateText(plugInMsg) {
+                        context.showNotification(it)
+                    }
+                }
                 else -> context.clearNotification()
             }
         }.addOnFailureListener { exp ->
@@ -102,7 +113,9 @@ class HeadphoneStateRepository private constructor(context: Context) : Broadcast
         ) {
             when {
                 fenceState.currentState == FenceState.TRUE -> {
-                    context.showNotification(plugInMsg)
+                    translateText(plugInMsg) {
+                        context.showNotification(it)
+                    }
                     headphoneStateListener?.onPlugIn()
                 }
                 fenceState.currentState == FenceState.FALSE -> {
