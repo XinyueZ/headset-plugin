@@ -11,7 +11,6 @@ import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
-import android.os.Build.VERSION_CODES.O
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.NotificationCompat
@@ -51,7 +50,7 @@ fun Context.showNotification(message: String, @DrawableRes icon: Int, isOngoing:
 
     if (isOngoing) builder.setOngoing(isOngoing) else builder.setOngoing(false)
 
-    if (VERSION.SDK_INT >= O) {
+    if (VERSION.SDK_INT >= VERSION_CODES.O) {
         val channel = NotificationChannel(
             NOTIFY_CHANNEL_ID,
             NOTIFY_CHANNEL_NAME,
