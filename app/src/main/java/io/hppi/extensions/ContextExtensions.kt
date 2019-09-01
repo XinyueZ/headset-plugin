@@ -6,23 +6,34 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.Drawable
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.Build.VERSION_CODES.O
+import androidx.annotation.DrawableRes
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ShareCompat
 import androidx.core.content.getSystemService
-import io.hppi.R
 import io.hppi.ui.MainActivity
 
 const val NOTIFY_ID: Int = 0x12
 const val NOTIFY_CHANNEL_ID: String = "hppi channel"
 const val NOTIFY_CHANNEL_NAME: String = NOTIFY_CHANNEL_ID
 
-fun Context.showNotification(message: String, isOngoing: Boolean = true) {
-    val largeNotificationImage =
-        BitmapFactory.decodeResource(resources, R.drawable.ic_headphone_state)
+fun Context.showNotification(message: String, @DrawableRes icon: Int, isOngoing: Boolean = true) {
+    val drawable: Drawable = AppCompatResources.getDrawable(this, icon)!!
+    val largeNotificationImage: Bitmap
+    largeNotificationImage = Bitmap.createBitmap(
+        drawable.intrinsicWidth,
+        drawable.intrinsicHeight,
+        Bitmap.Config.ARGB_8888
+    )
+    val canvas = Canvas(largeNotificationImage)
+    drawable.setBounds(0, 0, canvas.width, canvas.height)
+    drawable.draw(canvas)
 
     val ii = Intent(this, MainActivity::class.java)
     val pendingIntent = PendingIntent.getActivity(this, 0, ii, 0)
@@ -32,11 +43,11 @@ fun Context.showNotification(message: String, isOngoing: Boolean = true) {
         .setContentText(message)
         .setContentIntent(pendingIntent)
         .setWhen(System.currentTimeMillis())
-        .setLargeIcon(largeNotificationImage)
         .setDefaults(NotificationCompat.DEFAULT_ALL)
         .setPriority(NotificationCompat.PRIORITY_HIGH)
-        .setSmallIcon(R.drawable.ic_headphone_state)
-        .setContentTitle(getString(R.string.app_name))
+        .setSmallIcon(icon)
+        .setLargeIcon(largeNotificationImage)
+        .setContentTitle(getString(io.hppi.R.string.app_name))
 
     if (isOngoing) builder.setOngoing(isOngoing) else builder.setOngoing(false)
 

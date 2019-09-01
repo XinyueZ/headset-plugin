@@ -70,7 +70,7 @@ class HeadphoneStateRepository private constructor(context: Context) :
             when {
                 pluggedIn -> {
                     translateText(plugInMsg) {
-                        context.showNotification(it)
+                        context.showNotification(it, R.drawable.ic_headphone_notification)
                     }
                 }
                 else -> context.clearNotification()
@@ -108,7 +108,7 @@ class HeadphoneStateRepository private constructor(context: Context) :
             when {
                 fenceState.currentState == FenceState.TRUE -> {
                     translateText(plugInMsg) {
-                        context.showNotification(it)
+                        context.showNotification(it, R.drawable.ic_headphone_notification)
                     }
                     headphoneStateListener?.onPlugIn()
                 }

@@ -37,12 +37,14 @@
             <ImageView
                 android:layout_width="@android:dimen/thumbnail_width"
                 android:layout_height="@android:dimen/thumbnail_height"
-                android:layout_marginStart="@dimen/general_padding_margin_larger"
-                android:layout_marginEnd="@dimen/general_padding_margin_larger"
+                android:paddingTop="@dimen/general_padding_margin_larger"
+                android:paddingLeft="@dimen/general_padding_margin_larger"
+                android:paddingRight="@dimen/general_padding_margin_larger"
+                android:layout_margin="@dimen/general_padding_margin_larger"
                 app:layout_constraintBottom_toTopOf="@id/setup_description"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:srcCompat="@drawable/ic_headset_guide"
+                app:srcCompat="@drawable/ic_headphone"
                 tools:ignore="ContentDescription" />
 
 
@@ -52,7 +54,7 @@
                 android:layout_height="1dp"
                 android:orientation="horizontal"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintGuide_percent="0.6"
+                app:layout_constraintGuide_percent="0.5555"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.constraintlayout.widget.Guideline
