@@ -36,10 +36,17 @@ object AppWordingTranslator : IWordingTranslator {
         }
 
     override fun close() {
-        translator.close()
+        if (sourceLanguageId > 0) {
+            translator.close()
+        }
     }
 
     override fun translateText(text: String, callback: TranslatedCallback) {
+        if (Locale.getDefault().displayLanguage == "English") {
+            callback(text)
+            return
+        }
+
         sourceLanguageId =
             FirebaseTranslateLanguage.languageForLanguageCode(Locale.getDefault().language) ?: UND
         translator.downloadModelIfNeeded().addOnSuccessListener {
