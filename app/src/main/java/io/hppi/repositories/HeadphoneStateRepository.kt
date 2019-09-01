@@ -17,6 +17,7 @@ import com.google.android.gms.awareness.state.HeadphoneState
 import io.hppi.BuildConfig
 import io.hppi.R
 import io.hppi.domains.AppWordingTranslator
+import io.hppi.domains.HeadphoneStateListener
 import io.hppi.domains.IWordingTranslator
 import io.hppi.extensions.clearNotification
 import io.hppi.extensions.showNotification
@@ -29,17 +30,10 @@ interface IHeadphoneStateRepository {
     val snapshotClient: SnapshotClient
 }
 
-interface HeadphoneStateListener {
-    fun onPlugIn()
-    fun onPlugOut()
-}
-
-class HeadphoneStateRepository private constructor(
-    context: Context,
-    wordingTranslator: IWordingTranslator = AppWordingTranslator
-) : BroadcastReceiver(),
+class HeadphoneStateRepository private constructor(context: Context) :
+    BroadcastReceiver(),
     IHeadphoneStateRepository,
-    IWordingTranslator by wordingTranslator {
+    IWordingTranslator by AppWordingTranslator {
 
     var headphoneStateListener: HeadphoneStateListener? = null
 

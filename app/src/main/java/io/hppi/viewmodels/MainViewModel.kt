@@ -1,9 +1,6 @@
 package io.hppi.viewmodels
 
 import android.app.Application
-import android.content.Context
-import android.content.SharedPreferences
-import androidx.core.content.edit
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.lifecycle.AndroidViewModel
@@ -12,18 +9,17 @@ import androidx.lifecycle.MutableLiveData
 import io.hppi.BuildConfig
 import io.hppi.R
 import io.hppi.domains.AppWordingTranslator
+import io.hppi.domains.ISetupApp
 import io.hppi.domains.IWordingTranslator
+import io.hppi.domains.SetupApp
 import io.hppi.events.Event
-import io.hppi.repositories.HeadphoneStateListener
 
 const val IS_ACTIVATE_USAGE = "io.hppi.activate.usage"
 
-class MainViewModel(
-    app: Application,
-    wordingTranslator: IWordingTranslator = AppWordingTranslator
-) : AndroidViewModel(app),
-    HeadphoneStateListener,
-    IWordingTranslator by wordingTranslator {
+class MainViewModel(app: Application, private val setupAppDelegate: SetupApp) :
+    AndroidViewModel(app),
+    ISetupApp by setupAppDelegate,
+    IWordingTranslator by AppWordingTranslator {
 
     val appVersion = "v${BuildConfig.VERSION_NAME}+${BuildConfig.VERSION_CODE}"
     val appDescription =
@@ -41,21 +37,6 @@ class MainViewModel(
     private val _onTestFinished = MutableLiveData<Event<String>>()
     val onTestFinished: LiveData<Event<String>> = _onTestFinished
 
-    private val preferences: SharedPreferences by lazy {
-        getApplication<Application>().getSharedPreferences(
-            IS_ACTIVATE_USAGE,
-            Context.MODE_PRIVATE
-        )
-    }
-
-    var isActivate: Boolean
-        get() = preferences.getBoolean(IS_ACTIVATE_USAGE, false)
-        set(value) {
-            preferences.edit {
-                putBoolean(IS_ACTIVATE_USAGE, value)
-            }
-        }
-
     override fun onCleared() {
         close()
         super.onCleared()
@@ -69,34 +50,27 @@ class MainViewModel(
         }
     }
 
-    fun setup(isActivate: Boolean) {
-        when (isActivate) {
-            true -> done()
-            else -> abort()
-        }
-    }
+    override fun done() {
+        setupAppDelegate.done()
 
-    private fun done() {
         _onDone.value = Event(Unit)
         translateText(getApplication<Application>().getString(R.string.headphone_plug_in_test)) { translatedText ->
             _onTest.value = Event(translatedText)
         }
     }
 
-    private fun abort() {
-        isActivate = false
+    override fun abort() {
+        setupAppDelegate.abort()
+
         _onAbort.value = Event(Unit)
     }
 
     override fun onPlugIn() {
-        isActivate = true
+        setupAppDelegate.onPlugIn()
+
         translateText(getApplication<Application>().getString(R.string.headphone_test_finished)) { translatedText ->
             _onTestFinished.value = Event(translatedText)
         }
-    }
-
-    override fun onPlugOut() {
-        //TODO
     }
 
     fun shareApp(shareText: String) {
