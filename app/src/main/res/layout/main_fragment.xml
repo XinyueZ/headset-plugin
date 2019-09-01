@@ -26,18 +26,19 @@
 
             <TextView
                 android:id="@+id/setup_caption"
-                style="@style/TextAppearance.MaterialComponents.Headline3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingBottom="@dimen/general_padding_margin"
                 android:text="@string/app_name"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large.Inverse"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
-                android:layout_width="@android:dimen/notification_large_icon_width"
-                android:layout_height="@android:dimen/notification_large_icon_height"
-                android:layout_margin="@dimen/general_padding_margin"
+                android:layout_width="@android:dimen/thumbnail_width"
+                android:layout_height="@android:dimen/thumbnail_height"
+                android:layout_marginStart="@dimen/general_padding_margin_larger"
+                android:layout_marginEnd="@dimen/general_padding_margin_larger"
                 app:layout_constraintBottom_toTopOf="@id/setup_description"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -51,7 +52,7 @@
                 android:layout_height="1dp"
                 android:orientation="horizontal"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintGuide_percent="0.55"
+                app:layout_constraintGuide_percent="0.6"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.constraintlayout.widget.Guideline
@@ -68,10 +69,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:paddingLeft="@dimen/general_padding_margin_larger"
-                android:paddingTop="@dimen/general_padding_margin"
                 android:paddingRight="@dimen/general_padding_margin_larger"
                 android:visibility="@{viewModel.descriptionProcessed ? View.INVISIBLE : View.VISIBLE}"
-                app:layout_constraintBottom_toTopOf="@id/h_center_guide"
+                app:layout_constraintTop_toTopOf="@id/setup_description"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:startAnim="@{!viewModel.descriptionProcessed}">
@@ -107,12 +107,14 @@
 
             <TextView
                 android:id="@+id/setup_description"
-                style="@style/TextAppearance.MaterialComponents.Headline6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/general_padding_margin"
+                android:layout_marginStart="@dimen/general_padding_margin"
+                android:layout_marginEnd="@dimen/general_padding_margin"
+                android:layout_marginBottom="@dimen/general_padding_margin"
                 android:gravity="center"
                 android:text="@{viewModel.appDescription}"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium.Inverse"
                 android:visibility="@{viewModel.descriptionProcessed ? View.VISIBLE  : View.INVISIBLE}"
                 app:layout_constraintBottom_toTopOf="@id/h_center_guide"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -123,8 +125,8 @@
                 android:id="@+id/setup_abort"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onCheckedChanged="@{(_, checked)-> viewModel.setup(checked)}"
                 android:checked="@{viewModel.isActivate}"
+                android:onCheckedChanged="@{(_, checked)-> viewModel.setup(checked)}"
                 android:visibility="@{viewModel.descriptionProcessed ? View.VISIBLE  : View.INVISIBLE}"
                 app:backgroundTint="@color/colorAccent"
                 app:layout_constraintEnd_toEndOf="parent"

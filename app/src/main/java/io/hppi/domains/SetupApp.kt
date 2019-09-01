@@ -7,14 +7,28 @@ import io.hppi.viewmodels.IS_ACTIVATE_USAGE
 
 interface ISetupApp : HeadphoneStateListener {
     var isActivate: Boolean
-    fun setup(isActivate: Boolean)
-    fun abort()
-    fun done()
+
+    fun setup(isActivate: Boolean) {
+        when (isActivate) {
+            true -> done()
+            else -> abort()
+        }
+    }
+
+    fun abort() {
+        isActivate = false
+    }
+
+    fun done() = Unit
+
+    override fun onPlugIn() {
+        isActivate = true
+    }
+
+    override fun onPlugOut() = Unit
 }
 
-class SetupApp(context: Context) :
-    ISetupApp,
-    HeadphoneStateListener by SimpleHeadphoneStateListener {
+class SetupApp(context: Context) : ISetupApp {
 
     private val preferences: SharedPreferences by lazy {
         context.getSharedPreferences(
@@ -31,21 +45,4 @@ class SetupApp(context: Context) :
                 putBoolean(IS_ACTIVATE_USAGE, newValue)
             }
         }
-
-    override fun setup(isActivate: Boolean) {
-        when (isActivate) {
-            true -> done()
-            else -> abort()
-        }
-    }
-
-    override fun abort() {
-        isActivate = false
-    }
-
-    override fun onPlugIn() {
-        isActivate = true
-    }
-
-    override fun done() = Unit
 }

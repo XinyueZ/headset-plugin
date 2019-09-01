@@ -11,14 +11,13 @@ import io.hppi.R
 import io.hppi.domains.AppWordingTranslator
 import io.hppi.domains.ISetupApp
 import io.hppi.domains.IWordingTranslator
-import io.hppi.domains.SetupApp
 import io.hppi.events.Event
 
 const val IS_ACTIVATE_USAGE = "io.hppi.activate.usage"
 
-class MainViewModel(app: Application, private val setupAppDelegate: SetupApp) :
+class MainViewModel(app: Application, private val defaultSetup: ISetupApp) :
     AndroidViewModel(app),
-    ISetupApp by setupAppDelegate,
+    ISetupApp,
     IWordingTranslator by AppWordingTranslator {
 
     val appVersion = "v${BuildConfig.VERSION_NAME}+${BuildConfig.VERSION_CODE}"
@@ -50,8 +49,14 @@ class MainViewModel(app: Application, private val setupAppDelegate: SetupApp) :
         }
     }
 
+    fun shareApp(shareText: String) {
+        _onShareApp.value = Event(shareText)
+    }
+
+    override var isActivate: Boolean = defaultSetup.isActivate
+
     override fun done() {
-        setupAppDelegate.done()
+        defaultSetup.done()
 
         _onDone.value = Event(Unit)
         translateText(getApplication<Application>().getString(R.string.headphone_plug_in_test)) { translatedText ->
@@ -60,20 +65,15 @@ class MainViewModel(app: Application, private val setupAppDelegate: SetupApp) :
     }
 
     override fun abort() {
-        setupAppDelegate.abort()
-
+        defaultSetup.abort()
         _onAbort.value = Event(Unit)
     }
 
     override fun onPlugIn() {
-        setupAppDelegate.onPlugIn()
+        defaultSetup.onPlugIn()
 
         translateText(getApplication<Application>().getString(R.string.headphone_test_finished)) { translatedText ->
             _onTestFinished.value = Event(translatedText)
         }
-    }
-
-    fun shareApp(shareText: String) {
-        _onShareApp.value = Event(shareText)
     }
 }
