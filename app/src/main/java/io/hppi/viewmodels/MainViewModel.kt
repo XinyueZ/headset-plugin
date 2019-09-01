@@ -48,7 +48,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app), HeadphoneStateLis
         )
     }
 
-    private var isActivate: Boolean
+    var isActivate: Boolean
         get() = preferences.getBoolean(IS_ACTIVATE_USAGE, false)
         set(value) {
             preferences.edit {
@@ -85,7 +85,6 @@ class MainViewModel(app: Application) : AndroidViewModel(app), HeadphoneStateLis
     }
 
     private fun done() {
-        isActivate = true
         _onDone.value = Event(Unit)
         translateText(getApplication<Application>().getString(R.string.headphone_plug_in_test)) { translatedText ->
             _onTest.value = Event(translatedText)
@@ -98,6 +97,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app), HeadphoneStateLis
     }
 
     override fun onPlugIn() {
+        isActivate = true
         translateText(getApplication<Application>().getString(R.string.headphone_test_finished)) { translatedText ->
             _onTestFinished.value = Event(translatedText)
         }

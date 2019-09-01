@@ -26,7 +26,7 @@
 
             <TextView
                 android:id="@+id/setup_caption"
-                style="@style/TextAppearance.MaterialComponents.Headline2"
+                style="@style/TextAppearance.MaterialComponents.Headline3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingBottom="@dimen/general_padding_margin"
@@ -79,7 +79,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
+                    android:gravity="start|left"
                     android:orientation="vertical">
 
                     <View
@@ -91,7 +91,6 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="10dp"
-                        android:layout_marginStart="@dimen/general_padding_margin"
                         android:layout_marginEnd="@dimen/general_padding_margin"
                         android:layout_marginBottom="@dimen/general_padding_margin"
                         android:background="@android:color/darker_gray" />
@@ -99,7 +98,6 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="10dp"
-                        android:layout_marginStart="@dimen/general_padding_margin_larger"
                         android:layout_marginEnd="@dimen/general_padding_margin_larger"
                         android:background="@android:color/darker_gray" />
                 </LinearLayout>
@@ -109,7 +107,7 @@
 
             <TextView
                 android:id="@+id/setup_description"
-                style="@style/TextAppearance.MaterialComponents.Headline5"
+                style="@style/TextAppearance.MaterialComponents.Headline6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/general_padding_margin"
@@ -126,6 +124,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onCheckedChanged="@{(_, checked)-> viewModel.setup(checked)}"
+                android:checked="@{viewModel.isActivate}"
                 android:visibility="@{viewModel.descriptionProcessed ? View.VISIBLE  : View.INVISIBLE}"
                 app:backgroundTint="@color/colorAccent"
                 app:layout_constraintEnd_toEndOf="parent"

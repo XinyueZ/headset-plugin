@@ -2,7 +2,6 @@
 <resources>
 
     <style name="MainActivityTheme" parent="MainActivityThemeBase">
-        <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowLayoutInDisplayCutoutMode">
             shortEdges <!-- default, shortEdges, never -->
         </item>

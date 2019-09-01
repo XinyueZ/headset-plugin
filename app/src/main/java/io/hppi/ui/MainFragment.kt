@@ -1,5 +1,6 @@
 package io.hppi.ui
 
+import android.R
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -29,28 +30,32 @@ class MainFragment : Fragment() {
             lifecycleOwner = viewLifecycleOwner
             viewModel = vm
 
-            vm.processDescription()
-            vm.onAbort.observe(viewLifecycleOwner, EventObserver {
-                requireActivity().finish()
-            })
-            vm.onDone.observe(requireActivity(), EventObserver {
-                requireActivity().enqueueHPPiWorker().apply {
-                    this.headphoneStateListener = vm
-                }
-            })
-            vm.onTest.observe(requireActivity(), EventObserver { testNotifyMsg ->
-                Snackbar.make(root, testNotifyMsg, Snackbar.LENGTH_INDEFINITE).show()
-            })
-            vm.onTestFinished.observe(requireActivity(), EventObserver { testFinishedNotifyMsg ->
-                Snackbar.make(root, testFinishedNotifyMsg, Snackbar.LENGTH_INDEFINITE).setAction(
-                    android.R.string.ok
-                ) {
-                    requireActivity().finish()
-                }.show()
-            })
-            vm.onShareApp.observe(requireActivity(), EventObserver { shareText ->
-                requireActivity().shareCompat(shareText)
-            })
+            subscribeUi()
         }.root
+    }
+
+    private fun MainFragmentBinding.subscribeUi() {
+        vm.processDescription()
+        vm.onAbort.observe(viewLifecycleOwner, EventObserver {
+            requireActivity().finish()
+        })
+        vm.onDone.observe(requireActivity(), EventObserver {
+            requireActivity().enqueueHPPiWorker().apply {
+                this.headphoneStateListener = vm
+            }
+        })
+        vm.onTest.observe(requireActivity(), EventObserver { testNotifyMsg ->
+            Snackbar.make(root, testNotifyMsg, Snackbar.LENGTH_INDEFINITE).show()
+        })
+        vm.onTestFinished.observe(requireActivity(), EventObserver { testFinishedNotifyMsg ->
+            Snackbar.make(root, testFinishedNotifyMsg, Snackbar.LENGTH_INDEFINITE).setAction(
+                R.string.ok
+            ) {
+                requireActivity().finish()
+            }.show()
+        })
+        vm.onShareApp.observe(requireActivity(), EventObserver { shareText ->
+            requireActivity().shareCompat(shareText)
+        })
     }
 }
