@@ -23,16 +23,18 @@ const val NOTIFY_CHANNEL_ID: String = "hppi channel"
 const val NOTIFY_CHANNEL_NAME: String = NOTIFY_CHANNEL_ID
 
 fun Context.showNotification(message: String, @DrawableRes icon: Int, isOngoing: Boolean = true) {
-    val drawable: Drawable = AppCompatResources.getDrawable(this, icon)!!
-    val largeNotificationImage: Bitmap
-    largeNotificationImage = Bitmap.createBitmap(
-        drawable.intrinsicWidth,
-        drawable.intrinsicHeight,
-        Bitmap.Config.ARGB_8888
-    )
-    val canvas = Canvas(largeNotificationImage)
-    drawable.setBounds(0, 0, canvas.width, canvas.height)
-    drawable.draw(canvas)
+    val drawable: Drawable? = AppCompatResources.getDrawable(this, icon)
+    val largeNotificationImage: Bitmap? = drawable?.let { dr ->
+        Bitmap.createBitmap(
+            dr.intrinsicWidth,
+            dr.intrinsicHeight,
+            Bitmap.Config.ARGB_8888
+        ).apply {
+            val canvas = Canvas(this)
+            dr.setBounds(0, 0, canvas.width, canvas.height)
+            dr.draw(canvas)
+        }
+    }
 
     val ii = Intent(this, MainActivity::class.java)
     val pendingIntent = PendingIntent.getActivity(this, 0, ii, 0)
@@ -45,10 +47,17 @@ fun Context.showNotification(message: String, @DrawableRes icon: Int, isOngoing:
         .setDefaults(NotificationCompat.DEFAULT_ALL)
         .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setSmallIcon(icon)
-        .setLargeIcon(largeNotificationImage)
         .setContentTitle(getString(io.hppi.R.string.app_name))
 
-    if (isOngoing) builder.setOngoing(isOngoing) else builder.setOngoing(false)
+    if (largeNotificationImage != null) {
+        builder.setLargeIcon(largeNotificationImage)
+    }
+
+    if (isOngoing) {
+        builder.setOngoing(isOngoing)
+    } else {
+        builder.setOngoing(false)
+    }
 
     if (VERSION.SDK_INT >= VERSION_CODES.O) {
         val channel = NotificationChannel(
