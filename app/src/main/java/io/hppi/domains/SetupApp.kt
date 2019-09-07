@@ -8,8 +8,8 @@ import io.hppi.viewmodels.IS_ACTIVATE_USAGE
 interface ISetupApp : HeadphoneStateListener {
     var isActivate: Boolean
 
-    fun setup(isActivate: Boolean) {
-        when (isActivate) {
+    fun setup(isDone: Boolean) {
+        when (isDone) {
             true -> done()
             else -> abort()
         }
