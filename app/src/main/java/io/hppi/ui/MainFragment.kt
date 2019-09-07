@@ -11,6 +11,7 @@ import com.google.android.material.snackbar.Snackbar
 import io.hppi.databinding.MainFragmentBinding
 import io.hppi.events.EventObserver
 import io.hppi.extensions.shareCompat
+import io.hppi.repositories.HeadphoneStateRepository
 import io.hppi.services.enqueueHPPiWorker
 import io.hppi.viewmodels.MainViewModel
 import io.hppi.viewmodels.MainViewModelFactory
@@ -40,9 +41,10 @@ class MainFragment : Fragment() {
             requireActivity().finish()
         })
         vm.onDone.observe(requireActivity(), EventObserver {
-            requireActivity().enqueueHPPiWorker().apply {
-                this.headphoneStateListener = vm
-            }
+            requireActivity().enqueueHPPiWorker()
+            HeadphoneStateRepository
+                .getInstance(requireContext())
+                .headphoneStateListener = vm
         })
         vm.onTest.observe(requireActivity(), EventObserver { testNotifyMsg ->
             Snackbar.make(root, testNotifyMsg, Snackbar.LENGTH_INDEFINITE).show()
