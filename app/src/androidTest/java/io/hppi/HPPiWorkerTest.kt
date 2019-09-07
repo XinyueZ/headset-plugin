@@ -18,12 +18,12 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.common.truth.Truth.assertThat
 import io.hppi.services.HPPiWorker
 import io.hppi.services.enqueueHPPiWorker
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.Executor
-import java.util.concurrent.Executors
 
 @RunWith(AndroidJUnit4::class)
 class HPPiWorkerTest {

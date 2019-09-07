@@ -13,7 +13,9 @@ import com.google.android.gms.awareness.SnapshotClient
 import com.google.android.gms.awareness.fence.FenceState
 import com.google.android.gms.awareness.fence.FenceUpdateRequest
 import com.google.android.gms.awareness.fence.HeadphoneFence
+import com.google.android.gms.awareness.snapshot.HeadphoneStateResponse
 import com.google.android.gms.awareness.state.HeadphoneState
+import com.google.android.gms.tasks.Task
 import io.hppi.BuildConfig
 import io.hppi.R
 import io.hppi.domains.AppWordingTranslator
@@ -21,6 +23,13 @@ import io.hppi.domains.HeadphoneStateListener
 import io.hppi.domains.IWordingTranslator
 import io.hppi.extensions.clearNotification
 import io.hppi.extensions.showNotification
+import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CompletableJob
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 const val FENCE_KEY_HEADPHONE = "fence_key_headphone"
 const val FENCE_HEADPHONE_ACTION = BuildConfig.APPLICATION_ID + "FENCE_HEADPHONE_ACTION"
@@ -28,12 +37,18 @@ const val FENCE_HEADPHONE_ACTION = BuildConfig.APPLICATION_ID + "FENCE_HEADPHONE
 interface IHeadphoneStateRepository {
     val fenceClient: FenceClient
     val snapshotClient: SnapshotClient
+    fun setup(context: Context): Job
+    fun tearDown(context: Context)
 }
 
 class HeadphoneStateRepository private constructor(context: Context) :
     BroadcastReceiver(),
     IHeadphoneStateRepository,
-    IWordingTranslator by AppWordingTranslator {
+    IWordingTranslator by AppWordingTranslator,
+    CoroutineScope {
+
+    private val job: CompletableJob = Job()
+    override val coroutineContext: CoroutineContext get() = Dispatchers.IO + job
 
     var headphoneStateListener: HeadphoneStateListener? = null
 
@@ -57,21 +72,26 @@ class HeadphoneStateRepository private constructor(context: Context) :
 
     override val snapshotClient: SnapshotClient by lazy { Awareness.getSnapshotClient(context) }
 
-    fun setup(context: Context) {
+    override fun setup(context: Context) = launch {
         Log.i("HPPi", "setup()")
         context.registerReceiver(
-            this,
+            this@HeadphoneStateRepository,
             fenceHeadphoneActionFilter
         )
 
-        snapshotClient.headphoneState.addOnSuccessListener { headphoneStateResponse ->
-            val headphoneState = headphoneStateResponse.headphoneState
+        val getHeadphoneState: Task<HeadphoneStateResponse> = snapshotClient.headphoneState
+        while (!getHeadphoneState.isComplete) continue
+
+        if (getHeadphoneState.isSuccessful) {
+            val headphoneStateResponse: HeadphoneStateResponse =
+                requireNotNull(getHeadphoneState.result)
+            val headphoneState: HeadphoneState = headphoneStateResponse.headphoneState
             val pluggedIn = headphoneState.state == HeadphoneState.PLUGGED_IN
             when {
                 pluggedIn -> {
-                    translateText(plugInMsg) {
-                        context.showNotification(it, R.drawable.ic_headphone_notification)
-                    }
+                    val translated: String = translateText(plugInMsg)
+                    context.showNotification(translated, R.drawable.ic_headphone_notification)
+
                     headphoneStateListener?.onPlugIn()
                 }
                 else -> {
@@ -79,20 +99,22 @@ class HeadphoneStateRepository private constructor(context: Context) :
                     headphoneStateListener?.onPlugOut()
                 }
             }
-        }.addOnFailureListener { exp ->
-            Log.e("HPPi", "Fence could not get snapshot: $exp")
+        } else {
+            Log.e("HPPi", "Fence could not get snapshot: ${getHeadphoneState.exception}")
         }
 
-        fenceClient.updateFences(
-            FenceUpdateRequest.Builder()
-                .addFence(FENCE_KEY_HEADPHONE, headphoneFence, pendingIntent)
-                .build()
-        ).addOnFailureListener { exp ->
-            Log.e("HPPi", "Fence could not be registered: $exp")
+        val fenceRequest: FenceUpdateRequest = FenceUpdateRequest.Builder()
+            .addFence(FENCE_KEY_HEADPHONE, headphoneFence, pendingIntent)
+            .build()
+        val updateFences: Task<Void> = fenceClient.updateFences(fenceRequest)
+        while (!updateFences.isComplete) continue
+
+        if (!getHeadphoneState.isSuccessful) {
+            Log.e("HPPi", "Fence could not be registered: ${updateFences.exception}")
         }
     }
 
-    fun tearDown(context: Context) = context.unregisterReceiver(this)
+    override fun tearDown(context: Context) = context.unregisterReceiver(this)
 
     override fun onReceive(context: Context, intent: Intent) {
         if (!TextUtils.equals(
@@ -111,10 +133,16 @@ class HeadphoneStateRepository private constructor(context: Context) :
         ) {
             when {
                 fenceState.currentState == FenceState.TRUE -> {
-                    translateText(plugInMsg) {
-                        context.showNotification(it, R.drawable.ic_headphone_notification)
+                    launch {
+                        val translated: String = translateText(plugInMsg)
+                        withContext(Dispatchers.Main) {
+                            context.showNotification(
+                                translated,
+                                R.drawable.ic_headphone_notification
+                            )
+                            headphoneStateListener?.onPlugIn()
+                        }
                     }
-                    headphoneStateListener?.onPlugIn()
                 }
                 fenceState.currentState == FenceState.FALSE -> {
                     context.clearNotification()
