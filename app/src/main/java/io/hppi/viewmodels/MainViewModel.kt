@@ -23,8 +23,7 @@ class MainViewModel(
     app: Application,
     private val defaultSetup: ISetupApp,
     wordingTranslator: IWordingTranslator = AppWordingTranslator
-) :
-    AndroidViewModel(app),
+) : AndroidViewModel(app),
     ISetupApp,
     IWordingTranslator by wordingTranslator {
 
@@ -39,8 +38,8 @@ class MainViewModel(
     val onDone: LiveData<Event<Unit>> = _onDone
     private val _onShareApp = MutableLiveData<Event<String>>()
     val onShareApp: LiveData<Event<String>> = _onShareApp
-    private val _onTest = MutableLiveData<Event<String>>()
-    val onTest: LiveData<Event<String>> = _onTest
+    private val _onTrying = MutableLiveData<Event<String>>()
+    val onTrying: LiveData<Event<String>> = _onTrying
     private val _onTestFinished = MutableLiveData<Event<String>>()
     val onTestFinished: LiveData<Event<String>> = _onTestFinished
 
@@ -76,7 +75,7 @@ class MainViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val translated: String =
                 translateText(getApplication<Application>().getString(R.string.headphone_plug_in_test))
-            _onTest.postValue(Event(translated))
+            _onTrying.postValue(Event(translated))
         }
     }
 

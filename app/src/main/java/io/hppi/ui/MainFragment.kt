@@ -46,7 +46,7 @@ class MainFragment : Fragment() {
                 .getInstance(requireContext())
                 .headphoneStateListener = vm
         })
-        vm.onTest.observe(requireActivity(), EventObserver { testNotifyMsg ->
+        vm.onTrying.observe(requireActivity(), EventObserver { testNotifyMsg ->
             Snackbar.make(root, testNotifyMsg, Snackbar.LENGTH_INDEFINITE).show()
         })
         vm.onTestFinished.observe(requireActivity(), EventObserver { testFinishedNotifyMsg ->
