@@ -23,13 +23,13 @@ import io.hppi.domains.HeadphoneStateListener
 import io.hppi.domains.IWordingTranslator
 import io.hppi.extensions.clearNotification
 import io.hppi.extensions.showNotification
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.CoroutineContext
 
 const val FENCE_KEY_HEADPHONE = "fence_key_headphone"
 const val FENCE_HEADPHONE_ACTION = BuildConfig.APPLICATION_ID + "FENCE_HEADPHONE_ACTION"
@@ -41,10 +41,13 @@ interface IHeadphoneStateRepository {
     fun tearDown(context: Context)
 }
 
-class HeadphoneStateRepository private constructor(context: Context) :
+class HeadphoneStateRepository private constructor(
+    context: Context,
+    wordingTranslator: IWordingTranslator = AppWordingTranslator
+) :
     BroadcastReceiver(),
     IHeadphoneStateRepository,
-    IWordingTranslator by AppWordingTranslator,
+    IWordingTranslator by wordingTranslator,
     CoroutineScope {
 
     private val job: CompletableJob = Job()

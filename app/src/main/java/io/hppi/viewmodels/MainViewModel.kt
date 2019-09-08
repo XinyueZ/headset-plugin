@@ -19,10 +19,14 @@ import kotlinx.coroutines.withContext
 
 const val IS_ACTIVATE_USAGE = "io.hppi.activate.usage"
 
-class MainViewModel(app: Application, private val defaultSetup: ISetupApp) :
+class MainViewModel(
+    app: Application,
+    private val defaultSetup: ISetupApp,
+    wordingTranslator: IWordingTranslator = AppWordingTranslator
+) :
     AndroidViewModel(app),
     ISetupApp,
-    IWordingTranslator by AppWordingTranslator {
+    IWordingTranslator by wordingTranslator {
 
     val appVersion = "v${BuildConfig.VERSION_NAME}+${BuildConfig.VERSION_CODE}"
     val appDescription =
