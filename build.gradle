@@ -6,10 +6,10 @@ buildscript {
         coroutinesVersion = "1.3.0-RC2"
         espressoVersion = '3.1.1'
         kotlinVersion = '1.3.50'
-        lifecycleVersion = '2.2.0-alpha03'
+        lifecycleVersion = '2.2.0-alpha04'
         mockito = "3.0.0"
         mockitoKotlin = "1.6.0"
-        navigationVersion = '2.2.0-alpha01'
+        navigationVersion = '2.2.0-alpha02'
         truth = "0.42"
         workVersion = '2.2.0'
     }
