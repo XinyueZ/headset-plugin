@@ -1,12 +1,11 @@
 package io.hppi.domains
 
+import com.google.android.gms.tasks.Task
 import com.google.firebase.ml.naturallanguage.FirebaseNaturalLanguage
 import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslateLanguage
 import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslator
 import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslatorOptions
 import java.util.Locale
-
-typealias TranslatedCallback = (translatedText: String) -> Unit
 
 const val UND = -1
 
@@ -14,7 +13,7 @@ interface IWordingTranslator {
     var sourceLanguageId: Int
 
     fun close()
-    fun translateText(text: String, callback: TranslatedCallback)
+    suspend fun translateText(text: String): String
 }
 
 object AppWordingTranslator : IWordingTranslator {
@@ -41,19 +40,24 @@ object AppWordingTranslator : IWordingTranslator {
         }
     }
 
-    override fun translateText(text: String, callback: TranslatedCallback) {
+    override suspend fun translateText(text: String): String {
         if (Locale.getDefault().displayLanguage == "English") {
-            callback(text)
-            return
+            return text
         }
 
         sourceLanguageId =
             FirebaseTranslateLanguage.languageForLanguageCode(Locale.getDefault().language) ?: UND
-        translator.downloadModelIfNeeded().addOnSuccessListener {
-            translator.translate(text)
-                .addOnSuccessListener { translatedDescription ->
-                    callback(translatedDescription)
-                }
+
+        val download: Task<Void> = translator.downloadModelIfNeeded()
+        while (!download.isComplete) continue
+
+        val translate: Task<String> = translator.translate(text)
+        while (!translate.isComplete) continue
+
+        return if (translate.isSuccessful) {
+            translate.result ?: text
+        } else {
+            text
         }
     }
 }

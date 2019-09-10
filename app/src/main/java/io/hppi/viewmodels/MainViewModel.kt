@@ -6,19 +6,26 @@ import androidx.databinding.ObservableField
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import io.hppi.BuildConfig
 import io.hppi.R
 import io.hppi.domains.AppWordingTranslator
 import io.hppi.domains.ISetupApp
 import io.hppi.domains.IWordingTranslator
 import io.hppi.events.Event
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 const val IS_ACTIVATE_USAGE = "io.hppi.activate.usage"
 
-class MainViewModel(app: Application, private val defaultSetup: ISetupApp) :
-    AndroidViewModel(app),
+class MainViewModel(
+    app: Application,
+    private val defaultSetup: ISetupApp,
+    wordingTranslator: IWordingTranslator = AppWordingTranslator
+) : AndroidViewModel(app),
     ISetupApp,
-    IWordingTranslator by AppWordingTranslator {
+    IWordingTranslator by wordingTranslator {
 
     val appVersion = "v${BuildConfig.VERSION_NAME}+${BuildConfig.VERSION_CODE}"
     val appDescription =
@@ -31,8 +38,8 @@ class MainViewModel(app: Application, private val defaultSetup: ISetupApp) :
     val onDone: LiveData<Event<Unit>> = _onDone
     private val _onShareApp = MutableLiveData<Event<String>>()
     val onShareApp: LiveData<Event<String>> = _onShareApp
-    private val _onTest = MutableLiveData<Event<String>>()
-    val onTest: LiveData<Event<String>> = _onTest
+    private val _onTrying = MutableLiveData<Event<String>>()
+    val onTrying: LiveData<Event<String>> = _onTrying
     private val _onTestFinished = MutableLiveData<Event<String>>()
     val onTestFinished: LiveData<Event<String>> = _onTestFinished
 
@@ -43,9 +50,15 @@ class MainViewModel(app: Application, private val defaultSetup: ISetupApp) :
 
     fun processDescription() {
         descriptionProcessed.set(false)
-        translateText(getApplication<Application>().getString(R.string.headphone_plug_in_description)) { translatedText ->
-            appDescription.set(translatedText)
-            descriptionProcessed.set(true)
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val translated: String =
+                translateText(getApplication<Application>().getString(R.string.headphone_plug_in_description))
+
+            withContext(Dispatchers.Main) {
+                appDescription.set(translated)
+                descriptionProcessed.set(true)
+            }
         }
     }
 
@@ -57,10 +70,12 @@ class MainViewModel(app: Application, private val defaultSetup: ISetupApp) :
 
     override fun done() {
         defaultSetup.done()
-
         _onDone.value = Event(Unit)
-        translateText(getApplication<Application>().getString(R.string.headphone_plug_in_test)) { translatedText ->
-            _onTest.value = Event(translatedText)
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val translated: String =
+                translateText(getApplication<Application>().getString(R.string.headphone_plug_in_test))
+            _onTrying.postValue(Event(translated))
         }
     }
 
@@ -72,8 +87,10 @@ class MainViewModel(app: Application, private val defaultSetup: ISetupApp) :
     override fun onPlugIn() {
         defaultSetup.onPlugIn()
 
-        translateText(getApplication<Application>().getString(R.string.headphone_test_finished)) { translatedText ->
-            _onTestFinished.value = Event(translatedText)
+        viewModelScope.launch(Dispatchers.IO) {
+            val translated: String =
+                translateText(getApplication<Application>().getString(R.string.headphone_test_finished))
+            _onTestFinished.postValue(Event(translated))
         }
     }
 }
