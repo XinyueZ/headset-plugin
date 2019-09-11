@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">HPPi</string>
     <string name="headphone_plug_in_message">Headset plugged in</string>
-    <string name="headphone_plug_in_description">If headphone is plugged in, the system will notify you.</string>
+    <string name="headphone_plug_in_description">If the headset is plugged in, the system will notify you.</string>
     <string name="headphone_plug_in_test">Try to plug in the headset.</string>
     <string name="headphone_test_finished">Now, you know what this app does.</string>
     <string name="share_app" tools:ignore="MissingTranslation">http://tinyurl.com/yyk8vy26</string>
